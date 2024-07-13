@@ -2,10 +2,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const cells = document.querySelectorAll('.cell');
     const status = document.getElementById('status');
     const resetButton = document.getElementById('reset-btn');
+    const clickCounter = document.getElementById('click-count');
+    const twoPlayersRadio = document.getElementById('two-players');
+    const aiPlayerRadio = document.getElementById('ai-player');
 
     let currentPlayer = 'X';
     let gameActive = true;
     let gameState = ['', '', '', '', '', '', '', '', ''];
+    let clicks = 0;
+    let mode = 'two-players'; // Default mode is two players
 
     const winningConditions = [
         [0, 1, 2],
@@ -30,6 +35,9 @@ document.addEventListener("DOMContentLoaded", function () {
         clickedCell.textContent = currentPlayer;
         clickedCell.style.color = currentPlayer === 'X' ? '#2196f3' : '#f44336';
 
+        clicks++;
+        clickCounter.textContent = clicks;
+
         if (checkWin()) {
             gameActive = false;
             status.textContent = `${currentPlayer} has won!`;
@@ -42,8 +50,13 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-        status.textContent = `Player ${currentPlayer}'s turn`;
+        if (mode === 'two-players') {
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            status.textContent = `Player ${currentPlayer}'s turn`;
+        } else if (mode === 'ai-player') {
+            // Implement AI logic here (not covered in this snippet)
+            // For simplicity, this example focuses on two-player mode
+        }
     }
 
     function checkWin() {
@@ -58,6 +71,8 @@ document.addEventListener("DOMContentLoaded", function () {
         currentPlayer = 'X';
         gameActive = true;
         gameState = ['', '', '', '', '', '', '', '', ''];
+        clicks = 0;
+        clickCounter.textContent = clicks;
 
         status.textContent = `Player ${currentPlayer}'s turn`;
 
@@ -72,4 +87,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     resetButton.addEventListener('click', handleReset);
+
+    twoPlayersRadio.addEventListener('change', function () {
+        mode = 'two-players';
+        handleReset();
+    });
+
+    aiPlayerRadio.addEventListener('change', function () {
+        mode = 'ai-player';
+        handleReset();
+    });
 });
