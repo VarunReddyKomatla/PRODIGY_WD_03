@@ -30,9 +30,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     cells.forEach(cell => {
         cell.addEventListener("click", () => {
-            if (cell.textContent === "" && !checkWinner(board)) {
+            const cellIndex = cell.getAttribute('data-index');
+            if (board[cellIndex] === "" && !checkWinner(board)) {
+                board[cellIndex] = isPlayerX ? "X" : "O";
                 cell.textContent = isPlayerX ? "X" : "O";
-                board[cell.dataset.index] = isPlayerX ? "X" : "O";
                 clickCount++;
                 clickCounter.textContent = clickCount;
 
