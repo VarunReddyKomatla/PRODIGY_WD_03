@@ -1,18 +1,13 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const cells = document.querySelectorAll('.cell');
-    const status = document.getElementById('status');
-    const resetButton = document.getElementById('reset-btn');
-    const clickCounter = document.getElementById('click-count');
-    const twoPlayersRadio = document.getElementById('two-players');
-    const aiPlayerRadio = document.getElementById('ai-player');
-
-    let currentPlayer = 'X';
-    let gameActive = true;
-    let gameState = ['', '', '', '', '', '', '', '', ''];
-    let clicks = 0;
-    let mode = 'two-players'; // Default mode is two players
-
-    const winningConditions = [
+document.addEventListener("DOMContentLoaded", () => {
+    const cells = document.querySelectorAll(".cell");
+    const clickCounter = document.getElementById("click-counter");
+    const twoPlayerButton = document.getElementById("two-player");
+    const aiPlayerButton = document.getElementById("ai-player");
+    let clickCount = 0;
+    let isPlayerX = true;
+    let gameMode = 'two-player'; // Default game mode
+    let board = ["", "", "", "", "", "", "", "", ""];
+    const winningCombos = [
         [0, 1, 2],
         [3, 4, 5],
         [6, 7, 8],
@@ -23,78 +18,73 @@ document.addEventListener("DOMContentLoaded", function () {
         [2, 4, 6]
     ];
 
-    function handleCellClick(clickedCellEvent) {
-        const clickedCell = clickedCellEvent.target;
-        const clickedCellIndex = parseInt(clickedCell.getAttribute('id').substring(5));
+    twoPlayerButton.addEventListener("click", () => {
+        resetGame();
+        gameMode = 'two-player';
+    });
 
-        if (gameState[clickedCellIndex] !== '' || !gameActive) {
-            return;
-        }
+    aiPlayerButton.addEventListener("click", () => {
+        resetGame();
+        gameMode = 'ai';
+    });
 
-        gameState[clickedCellIndex] = currentPlayer;
-        clickedCell.textContent = currentPlayer;
-        clickedCell.style.color = currentPlayer === 'X' ? '#2196f3' : '#f44336';
+    cells.forEach(cell => {
+        cell.addEventListener("click", () => {
+            if (cell.textContent === "" && !checkWinner(board)) {
+                cell.textContent = isPlayerX ? "X" : "O";
+                board[cell.dataset.index] = isPlayerX ? "X" : "O";
+                clickCount++;
+                clickCounter.textContent = clickCount;
 
-        clicks++;
-        clickCounter.textContent = clicks;
+                if (checkWinner(board)) {
+                    alert(`${isPlayerX ? "Player X" : "Player O"} wins!`);
+                    return;
+                }
 
-        if (checkWin()) {
-            gameActive = false;
-            status.textContent = `${currentPlayer} has won!`;
-            return;
-        }
+                if (clickCount === 9) {
+                    alert("It's a draw!");
+                    return;
+                }
 
-        if (!gameState.includes('')) {
-            gameActive = false;
-            status.textContent = "It's a draw!";
-            return;
-        }
+                if (gameMode === 'ai' && !isPlayerX) {
+                    makeAIMove();
+                }
 
-        if (mode === 'two-players') {
-            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-            status.textContent = `Player ${currentPlayer}'s turn`;
-        } else if (mode === 'ai-player') {
-            // Implement AI logic here (not covered in this snippet)
-            // For simplicity, this example focuses on two-player mode
-        }
-    }
+                isPlayerX = !isPlayerX;
+            }
+        });
+    });
 
-    function checkWin() {
-        return winningConditions.some(condition => {
-            return condition.every(index => {
-                return gameState[index] === currentPlayer;
+    function checkWinner(board) {
+        return winningCombos.some(combo => {
+            return combo.every(index => {
+                return board[index] === (isPlayerX ? "X" : "O");
             });
         });
     }
 
-    function handleReset() {
-        currentPlayer = 'X';
-        gameActive = true;
-        gameState = ['', '', '', '', '', '', '', '', ''];
-        clicks = 0;
-        clickCounter.textContent = clicks;
+    function makeAIMove() {
+        let availableCells = board.map((cell, index) => cell === "" ? index : null).filter(val => val !== null);
+        let randomIndex = availableCells[Math.floor(Math.random() * availableCells.length)];
+        board[randomIndex] = "O";
+        document.querySelector(`.cell[data-index="${randomIndex}"]`).textContent = "O";
 
-        status.textContent = `Player ${currentPlayer}'s turn`;
+        if (checkWinner(board)) {
+            alert("AI wins!");
+        }
 
-        cells.forEach(cell => {
-            cell.textContent = '';
-            cell.style.color = '#000';
-        });
+        isPlayerX = true;
+        clickCount++;
+        clickCounter.textContent = clickCount;
     }
 
-    cells.forEach(cell => {
-        cell.addEventListener('click', handleCellClick);
-    });
-
-    resetButton.addEventListener('click', handleReset);
-
-    twoPlayersRadio.addEventListener('change', function () {
-        mode = 'two-players';
-        handleReset();
-    });
-
-    aiPlayerRadio.addEventListener('change', function () {
-        mode = 'ai-player';
-        handleReset();
-    });
+    function resetGame() {
+        board = ["", "", "", "", "", "", "", "", ""];
+        cells.forEach(cell => {
+            cell.textContent = "";
+        });
+        clickCount = 0;
+        clickCounter.textContent = clickCount;
+        isPlayerX = true;
+    }
 });
