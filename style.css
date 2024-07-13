@@ -37,6 +37,14 @@ body {
     margin-top: 20px;
 }
 
+#click-counter {
+    margin-top: 10px;
+}
+
+#options {
+    margin-top: 20px;
+}
+
 #reset-btn {
     margin-top: 20px;
     padding: 10px 20px;
