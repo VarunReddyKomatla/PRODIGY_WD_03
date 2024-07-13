@@ -1,11 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const cells = document.querySelectorAll(".cell");
-    const clickCounter = document.getElementById("click-counter");
-    const twoPlayerButton = document.getElementById("two-player");
-    const aiPlayerButton = document.getElementById("ai-player");
-    let clickCount = 0;
+    const resetButton = document.getElementById("reset-button");
     let isPlayerX = true;
-    let gameMode = 'two-player'; // Default game mode
     let board = ["", "", "", "", "", "", "", "", ""];
     const winningCombos = [
         [0, 1, 2],
@@ -18,43 +14,29 @@ document.addEventListener("DOMContentLoaded", () => {
         [2, 4, 6]
     ];
 
-    twoPlayerButton.addEventListener("click", () => {
-        resetGame();
-        gameMode = 'two-player';
-    });
-
-    aiPlayerButton.addEventListener("click", () => {
-        resetGame();
-        gameMode = 'ai';
-    });
-
     cells.forEach(cell => {
         cell.addEventListener("click", () => {
             const cellIndex = cell.getAttribute('data-index');
             if (board[cellIndex] === "" && !checkWinner(board)) {
                 board[cellIndex] = isPlayerX ? "X" : "O";
                 cell.textContent = isPlayerX ? "X" : "O";
-                clickCount++;
-                clickCounter.textContent = clickCount;
 
                 if (checkWinner(board)) {
                     alert(`${isPlayerX ? "Player X" : "Player O"} wins!`);
                     return;
                 }
 
-                if (clickCount === 9) {
+                if (board.every(cell => cell !== "")) {
                     alert("It's a draw!");
                     return;
-                }
-
-                if (gameMode === 'ai' && !isPlayerX) {
-                    makeAIMove();
                 }
 
                 isPlayerX = !isPlayerX;
             }
         });
     });
+
+    resetButton.addEventListener("click", resetGame);
 
     function checkWinner(board) {
         return winningCombos.some(combo => {
@@ -64,28 +46,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function makeAIMove() {
-        let availableCells = board.map((cell, index) => cell === "" ? index : null).filter(val => val !== null);
-        let randomIndex = availableCells[Math.floor(Math.random() * availableCells.length)];
-        board[randomIndex] = "O";
-        document.querySelector(`.cell[data-index="${randomIndex}"]`).textContent = "O";
-
-        if (checkWinner(board)) {
-            alert("AI wins!");
-        }
-
-        isPlayerX = true;
-        clickCount++;
-        clickCounter.textContent = clickCount;
-    }
-
     function resetGame() {
         board = ["", "", "", "", "", "", "", "", ""];
         cells.forEach(cell => {
             cell.textContent = "";
         });
-        clickCount = 0;
-        clickCounter.textContent = clickCount;
         isPlayerX = true;
     }
 });
